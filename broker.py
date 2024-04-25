@@ -30,6 +30,16 @@ class TCP_SEND:
         if self.connected:
             self.socket_tcp.sendall(message.encode())
 
+def udp_server(host, port):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
+        udp.bind((host, port))
+
+        print(f"Conexão temporaria estabelecida com: {host}:{port}")
+        while True:
+            device_info, device_server_adress = udp.recvfrom(1024)
+            if device_info:
+                return device_info.decode()
+                
 
 
 def success_response(data=None):
@@ -55,17 +65,31 @@ def request_received(topic):
 
 
 
-@app.route("/RGBlight/<id>", methods=['GET'])
+@app.route("/RGBlight/<id>/color", methods=['GET'])
 def get_rgb_id(id):
     try:
-        return success_response(devices.RGBlight[int(id)-1])
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("RGBlight/"+str(id))
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/door/<id>", methods=['GET'])
 def get_door_id(id):
     try:
-        return success_response(devices.door[int(id)-1])
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("door/"+str(id))
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -74,29 +98,54 @@ def get_air_id(id):
     try:
         tcp = TCP_SEND("127.0.0.1", 3000)
         tcp.connect()
-        tcp.send_request(str(id))
-        return success_response(devices.air[int(id)-1])
+        tcp.send_request("air/"+str(id))
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/RGBlight", methods=['GET'])
 def get_rgb():
     try:
-        return success_response(devices.RGBlight)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("RGBlight")
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/door", methods=['GET'])
 def get_door():
     try:
-        return success_response(devices.door)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("door")
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/air", methods=['GET'])
 def get_air():
     try:
-        return success_response(devices.air)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("air")
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -104,24 +153,30 @@ def get_air():
 @app.route("/air/<id>/<on>", methods=['PATCH'])
 def patch_air_on(id,on):
     try:
-        devices.air[int(id)-1]['state'] = on
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.air)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("air/"+str(id)+"/"+str(on))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/air/<id>/<off>", methods=['PATCH'])
 def patch_air_off(id,off):
     try:
-        devices.air[int(id)-1]['state'] = off
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.air)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("air/"+str(id)+"/"+str(off))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -129,12 +184,15 @@ def patch_air_off(id,off):
 @app.route("/air/<id>/temperature/<temperature>", methods=['PATCH'])
 def patch_air_change_temperature(id,temperature):
     try:
-        devices.air[int(id)-1]['temperature'] = temperature
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.air)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("air/"+str(id)+"/temperature/"+str(temperature))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -142,12 +200,15 @@ def patch_air_change_temperature(id,temperature):
 @app.route("/RGBlight/<id>/<on>", methods=['PATCH'])
 def patch_RGB_on(id,on):
     try:
-        devices.RGBlight[int(id)-1]['state'] = on
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.RGBlight)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("RGBlight/"+str(id)+"/"+str(on))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
         
@@ -156,12 +217,15 @@ def patch_RGB_on(id,on):
 @app.route("/RGBlight/<id>/<off>", methods=['PATCH'])
 def patch_RGB_off(id,off):
     try:
-        devices.RGBlight[int(id)-1]['state'] = off
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.RGBlight)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("RGBlight/"+str(id)+"/"+str(off))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -169,12 +233,15 @@ def patch_RGB_off(id,off):
 @app.route("/RGBlight/<id>/color/<color>", methods=['PATCH'])
 def patch_change_RGBlight(id,color):
     try:
-        devices.RGBlight[int(id)-1]['color'] = color
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.RGBlight)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("RGBlight/"+str(id)+"/color/"+str(color))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -182,24 +249,30 @@ def patch_change_RGBlight(id,color):
 @app.route("/door/<id>/<op>", methods=['PATCH'])
 def patch_open_door(id,op):
     try:
-        devices.door[int(id)-1]['state'] = op
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.door)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("door/"+str(id)+"/"+str(op))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
 @app.route("/door/<id>/<cls>", methods=['PATCH'])
 def patch_close_door(id,cls):
     try:
-        devices.door[int(id)-1]['state'] = cls
-        with open("devices.py", "w") as file:
-            file.write("air = " + repr(devices.air) + "\n")
-            file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-            file.write("door = " + repr(devices.door) + "\n")
-        return success_response(devices.door)
+        tcp = TCP_SEND("127.0.0.1", 3000)
+        tcp.connect()
+        tcp.send_request("door/"+str(id)+"/"+str(cls))
+
+        try:
+            udp_message = udp_server("127.0.0.1", 54310)
+            return success_response(udp_message)
+        except:
+            return error_response()
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
