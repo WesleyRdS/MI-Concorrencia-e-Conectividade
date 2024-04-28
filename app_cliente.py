@@ -1,6 +1,10 @@
 import requests
-
+import threading
 base_url = "http://localhost:5000"
+
+def response_receiver():
+    response = requests.get(f"{base_url}/response")
+    handle_response(response)
 
 def turn_on_air(id,state):
     change = {"state" : state}
@@ -151,5 +155,8 @@ def app_machine():
         
 
 if __name__ == "__main__":
+    thr = threading.Thread(target=response_receiver)
+    thr.start()
     while True:
         app_machine()
+        

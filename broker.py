@@ -7,9 +7,7 @@ app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 topic_queue = {}
-devices_connections_air = []
-devices_connections_rgb = []
-devices_connections_door = []
+
 
 class TCP_SEND:
     def __init__(self, host, port) -> None:
@@ -43,9 +41,9 @@ def udp_server(host, port):
                 return device_info.decode()
                 
 def connect_continuos(host, port):
-    global devices_connections_air
-    global devices_connections_door
-    global devices_connections_rgb
+    devices_connections_air = []
+    devices_connections_door = []
+    devices_connections_rgb = []
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
         udp.bind((host, port))
 
@@ -56,14 +54,13 @@ def connect_continuos(host, port):
                 string = device_info.decode().split("/")
                 match string[0]:
                     case "air":
-                        global devices_connections_air
                         DB_refactor(string, devices_connections_air)
                     case "RGBlight":
-                        global devices_connections_door
                         DB_refactor(string, devices_connections_rgb)
                     case "door":
-                        global devices_connections_door
                         DB_refactor(string, devices_connections_door)
+                    case "connection_error":
+                        return error_response(string[1]) 
                     case _:
                         pass   
                 dados = {
@@ -85,6 +82,8 @@ def DB_refactor(lt, devices_connections):
             case "air":
                 for i in devices_connections:
                     if i[1] == lt[1]:
+                        return
+                    if i[3] == lt[3]:
                         return
                     devices_connections.append(lt)
                         
@@ -126,7 +125,6 @@ def get_port_by_id(type, id, dev):
 
         case "door":
             for i in dev:
-                print(i)
                 if i[1] == id:
                     ip.append(i[2])
                     ip.append(int(i[3]))
@@ -151,6 +149,13 @@ def success_response(data=None):
 def error_response(message):
     return jsonify({"status": "error", "message": message}), 400
 
+@app.route("/response", methods=['GET'])
+def send_response():
+    try:
+        udp_message = udp_server("127.0.0.1", 54310)
+        return success_response(udp_message)
+    except:
+        return error_response("Dado solicitado não recebido")
 
 
 @app.route("/<string:topic>", methods=['PUT', 'GET'])
@@ -178,7 +183,7 @@ def get_rgb_id(id):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -194,7 +199,7 @@ def get_door_id(id):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -210,7 +215,7 @@ def get_air_id(id):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -226,7 +231,7 @@ def get_rgb():
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -242,7 +247,7 @@ def get_door():
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -258,7 +263,7 @@ def get_air():
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -276,7 +281,7 @@ def patch_air_on(id,on):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -293,7 +298,7 @@ def patch_air_off(id,off):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -311,7 +316,7 @@ def patch_air_change_temperature(id,temperature):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -329,7 +334,7 @@ def patch_RGB_on(id,on):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
         
@@ -348,7 +353,7 @@ def patch_RGB_off(id,off):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -366,7 +371,7 @@ def patch_change_RGBlight(id,color):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -384,7 +389,7 @@ def patch_open_door(id,op):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 
@@ -401,7 +406,7 @@ def patch_close_door(id,cls):
             udp_message = udp_server("127.0.0.1", 54310)
             return success_response(udp_message)
         except:
-            return error_response()
+            return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
 

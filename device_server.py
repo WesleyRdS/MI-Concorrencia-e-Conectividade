@@ -1,6 +1,8 @@
 import socket
-import devices
+
 import json
+import threading
+import random
 
 
 
@@ -10,6 +12,39 @@ class device:
         self.id = id
         self.host = host
         self.port = port
+        self.status = ""
+        self.data = None
+    
+    def set_initial_params(self):
+        if self.type == "air" or self.type == "RGBlight":
+            l = ['on', "off"]
+            self.status = random.choice(l)
+        else:
+            l = ['open', "close"]
+            self.status = random.choice(l)
+        
+        if self.type == "air":
+            self.data = random.randint(10,35)
+        else:
+            l = ['azul', "vermelho","amarelo","verde","branca","violeta","ametista","laranja","azul"]
+            self.data = random.choice(l)
+
+    def get_status(self):
+        return self.status
+    
+    def set_status(self, i):
+        self.status = i
+    
+    def get_data(self):
+        return self.data
+
+    def set_data(self, i):
+        if self.type == "air":
+            self.data = i   
+        elif self.type == "RGBlight":
+            self.data = i 
+        else:
+            pass
 
     def initial_sendo(self):
         string = self.type+"/"+str(self.id)+"/"+self.host+"/"+str(self.port) 
@@ -33,54 +68,60 @@ def handle_tcp_received(conn, adrr):
             return request_list
 
 
-def midleware_tcp_udp(tcp_host, tcp_port, udp_host, udp_port):
+def midleware_tcp_udp(tcp_host, tcp_port, udp_host, udp_port, device):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as tcp_socket:
-        tcp_socket.bind((tcp_host,tcp_port))
-        tcp_socket.listen(5)
-        print(f"Aguardando conexões TCP em {tcp_host}:{tcp_port}...")
+        try:
+            tcp_socket.bind((tcp_host,tcp_port))
+            tcp_socket.listen(5)
+            print(f"Aguardando conexões TCP em {tcp_host}:{tcp_port}...")
 
-        while True:
-            conn, addr = tcp_socket.accept()
-            acess_data = handle_tcp_received(conn, addr)
-            s = acess_data_base(acess_data)
-            udp_return = json.dumps(s)
-            if udp_return != []:
-                try:
-                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-                        udp_socket.sendto(udp_return.encode(), (udp_host, udp_port))
-                        udp_socket.close()
-                except socket.error as e:
+            while True:
+                conn, addr = tcp_socket.accept()
+                acess_data = handle_tcp_received(conn, addr)
+                s = acess_data_base(acess_data,device)
+                udp_return = str(s)
+                if udp_return != []:
                     try:
-                        string = "Erro de soquete: "+str(e)
                         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-                            udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                            udp_socket.sendto(udp_return.encode(), (udp_host, udp_port))
                             udp_socket.close()
-                    except:
-                        print("Erro de soquete:", e)
-                except TimeoutError as e:
-                    try:
-                        string = "Erro de tempo: "+str(e)
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-                            udp_socket.sendto(string.encode(), (udp_host, udp_port))
-                            udp_socket.close()
-                    except:
-                        print("Erro de tempo:", e)
-                except OSError as e:
-                    try:
-                        string = "Erro de sistema operacional: "+str(e)
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-                            udp_socket.sendto(string.encode(), (udp_host, udp_port))
-                            udp_socket.close()
-                    except:
-                        print("Erro de sistema operacional:", e)
-                except Exception as e:
-                    try:
-                        string = "Outro erro: "+str(e)
-                        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-                            udp_socket.sendto(string.encode(), (udp_host, udp_port))
-                            udp_socket.close()
-                    except:
-                        print("Outro erro:", e)
+                    except socket.error as e:
+                        try:
+                            string = "Erro de soquete: "+str(e)
+                            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+                                udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                                udp_socket.close()
+                        except:
+                            print("Erro de soquete:", e)
+                    except TimeoutError as e:
+                        try:
+                            string = "Erro de tempo: "+str(e)
+                            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+                                udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                                udp_socket.close()
+                        except:
+                            print("Erro de tempo:", e)
+                    except OSError as e:
+                        try:
+                            string = "Erro de sistema operacional: "+str(e)
+                            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+                                udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                                udp_socket.close()
+                        except:
+                            print("Erro de sistema operacional:", e)
+                    except Exception as e:
+                        try:
+                            string = "Outro erro: "+str(e)
+                            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+                                udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                                udp_socket.close()
+                        except:
+                            print("Outro erro:", e)
+        except:
+            string = "O dispositivo falhou em se conectar. A porta informada ja esta sendo ultilizada"
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+                udp_socket.sendto(string.encode(), (udp_host, udp_port))
+                udp_socket.close()
                 
 
 
@@ -88,68 +129,51 @@ def midleware_tcp_udp(tcp_host, tcp_port, udp_host, udp_port):
 
 
 
-def acess_data_base(data):
+def acess_data_base(data,device):
     dev = []
     match len(data):
         case 1:
-            if data[0] == "air":
-                dev = devices.air
-            elif data[0] == "RGBlight":
-                dev = devices.RGBlight
-            elif data[0] == "door":
-                dev = devices.door
-            else:
-                pass
+            dev = device
         case 2:
-            if data[0] == "air":
-                dev = devices.air[int(data[1])-1]
-            elif data[0] == "RGBlight":
-                dev = devices.RGBlight[int(data[1])-1]
-            elif data[0] == "door":
-                dev = devices.door[int(data[1])-1]
-            else:
-                pass
+            dev = device.get_data()
         case 3:
-            if data[0] == "air":
-                devices.air[int(data[1])-1]['state'] = data[2]
-                dev = devices.air[int(data[1])-1]
-                DB_refactor()
-            elif data[0] == "RGBlight":
-                devices.RGBlight[int(data[1])-1]['state'] = data[2]
-                dev = devices.RGBlight[int(data[1])-1]
-                DB_refactor()
-            elif data[0] == "door":
-                devices.door[int(data[1])-1]['state'] = data[2]
-                dev = devices.door[int(data[1])-1]
-                DB_refactor()
-                
-            else:
-                pass
+            device.set_status(data[2])
         case 4:
-            if data[0] == "air":
-                if data[2] == "temperature":
-                    devices.air[int(data[1])-1]['temperature'] = data[3]
-                    dev = devices.air[int(data[1])-1]
-                    DB_refactor()
-                else:
-                    pass
-            elif data[0] == "RGBlight":
-                if data[2] == "color":
-                    devices.RGBlight[int(data[1])-1]['color'] = data[3]
-                    dev = devices.RGBlight[int(data[1])-1]
-                    DB_refactor()
-                else:
-                    pass    
+            device.set_data(data[3])        
+        case _:
+            pass
+    return dev
+
+def interface(device):
+    print("1 - Para mudar o status do dispositivo")
+    print("2 - Para mudar seus dados")
+    j = int(input("Digite o numero da opção que deseja selecionar: "))
+    match j:
+        case 1:
+            if device.get_status == "on":
+                device.set_status("off")
+            elif device.get_status == "off":
+                device.set_status("on")
+            elif device.get_status == "open":
+                device.set_status("close")
+            elif device.get_status == "close":
+                device.set_status("open")
             else:
                 pass
-    return dev
-            
-                
-def DB_refactor():
-    with open("devices.py", "w") as file:
-        file.write("air = " + repr(devices.air) + "\n")
-        file.write("RGBlight = " + repr(devices.RGBlight) + "\n")
-        file.write("door = " + repr(devices.door) + "\n")
+            return
+        case 2:
+            if device.type == "air":
+                i = int(input("Digite a temperatura desejada: "))
+                device.set_data(str(i))
+            elif device.type == "air":
+                i = str(input("Digite a cor desejada: "))
+                device.set_data(i)
+            else:
+                pass
+            return
+        case _:
+            return
+    
 
 if __name__ == "__main__":
     TCP_HOST = '0.0.0.0'
@@ -162,5 +186,10 @@ if __name__ == "__main__":
     id = int(input("digite o ID: "))
    
     d = device(type, id, TCP_HOST, TCP_PORT)
+    d.set_initial_params()
     d.initial_sendo()
-    midleware_tcp_udp(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT)
+    thr = threading.Thread(target=midleware_tcp_udp, args=(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT,d))
+    thr.start()
+    while True:
+        interface(d)
+    
