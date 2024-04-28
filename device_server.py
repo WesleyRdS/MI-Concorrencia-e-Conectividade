@@ -2,6 +2,23 @@ import socket
 import devices
 import json
 
+
+
+class device:
+    def __init__(self,type, id, host, port) -> None:
+        self.type = type
+        self.id = id
+        self.host = host
+        self.port = port
+
+    def initial_sendo(self):
+        string = self.type+"/"+str(self.id)+"/"+self.host+"/"+str(self.port) 
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+            udp_socket.sendto(string.encode(), ("0.0.0.0", 54020))
+            udp_socket.close()
+
+
+
 def handle_tcp_received(conn, adrr):
     with conn:
         print(f"Conexão estabelecida com: {adrr}")
@@ -135,10 +152,15 @@ def DB_refactor():
         file.write("door = " + repr(devices.door) + "\n")
 
 if __name__ == "__main__":
-    TCP_HOST = '127.0.0.1'
-    TCP_PORT = 3000
+    TCP_HOST = '0.0.0.0'
+    TCP_PORT = int(input("digite a porta TCP que deseja conectar"))
 
-    UDP_HOST = '127.0.0.1'
+    UDP_HOST = '0.0.0.0'
     UDP_PORT = 54310
-
+    
+    type = str(input("Digite o tipo de dispositivo: "))
+    id = int(input("digite o ID: "))
+   
+    d = device(type, id, TCP_HOST, TCP_PORT)
+    d.initial_sendo()
     midleware_tcp_udp(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT)

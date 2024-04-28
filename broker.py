@@ -1,13 +1,15 @@
 from flask import Flask, make_response, request, jsonify
 import socket
-import devices
-import socket
+import threading
+import json
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 topic_queue = {}
-
+devices_connections_air = []
+devices_connections_rgb = []
+devices_connections_door = []
 
 class TCP_SEND:
     def __init__(self, host, port) -> None:
@@ -40,6 +42,104 @@ def udp_server(host, port):
             if device_info:
                 return device_info.decode()
                 
+def connect_continuos(host, port):
+    global devices_connections_air
+    global devices_connections_door
+    global devices_connections_rgb
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
+        udp.bind((host, port))
+
+        print(f"Conexão temporaria estabelecida com: {host}:{port}")
+        while True:
+            device_info, device_server_adress = udp.recvfrom(1024)
+            if device_info:
+                string = device_info.decode().split("/")
+                match string[0]:
+                    case "air":
+                        global devices_connections_air
+                        DB_refactor(string, devices_connections_air)
+                    case "RGBlight":
+                        global devices_connections_door
+                        DB_refactor(string, devices_connections_rgb)
+                    case "door":
+                        global devices_connections_door
+                        DB_refactor(string, devices_connections_door)
+                    case _:
+                        pass   
+                dados = {
+                    "air": devices_connections_air,
+                    "RGBlight": devices_connections_rgb,
+                    "door": devices_connections_door
+                }
+
+                with open("connections.json", "w") as file:
+                     json.dump(dados, file)
+               
+
+
+
+
+def DB_refactor(lt, devices_connections):
+    if len(devices_connections) != 0:
+        match lt[0]:
+            case "air":
+                for i in devices_connections:
+                    if i[1] == lt[1]:
+                        return
+                    devices_connections.append(lt)
+                        
+            case "RGBlight":
+                for i in devices_connections:
+                    if i[1] == lt[1]:
+                        return
+                    devices_connections.append(lt)
+            case "door":
+                for i in devices_connections:
+                    if i[1] == lt[1]:
+                        return
+                    devices_connections.append(lt) 
+            case _:
+                pass
+    else:
+        devices_connections.append(lt)
+
+
+
+
+def get_port_by_id(type, id, dev):
+    ip = []
+    print(dev)
+    match type:
+        case "air":
+            for i in dev:
+                if i[1] == id:
+                    ip.append(i[2])
+                    ip.append(int(i[3]))
+                    return ip
+             
+        case "RGBlight":
+            for i in dev:
+                if i[1] == id:
+                    ip.append(i[2])
+                    ip.append(int(i[3]))
+                    return ip
+
+        case "door":
+            for i in dev:
+                print(i)
+                if i[1] == id:
+                    ip.append(i[2])
+                    ip.append(int(i[3]))
+                    return ip
+        case _:
+            print("dsfs")
+
+def ler_json():
+    with open('connections.json', 'r') as file:
+    # Carregar o conteúdo do arquivo em uma lista Python
+        lista_rgb = json.load(file)
+    
+    return lista_rgb
 
 
 def success_response(data=None):
@@ -67,8 +167,11 @@ def request_received(topic):
 
 @app.route("/RGBlight/<id>/color", methods=['GET'])
 def get_rgb_id(id):
+    v = []
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("RGBlight/"+str(id))
         try:
@@ -82,7 +185,9 @@ def get_rgb_id(id):
 @app.route("/door/<id>", methods=['GET'])
 def get_door_id(id):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("door", str(id), vector["door"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("door/"+str(id))
         try:
@@ -96,7 +201,9 @@ def get_door_id(id):
 @app.route("/air/<id>/temperature", methods=['GET'])
 def get_air_id(id):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("air", str(id), vector["air"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("air/"+str(id))
         try:
@@ -110,7 +217,9 @@ def get_air_id(id):
 @app.route("/RGBlight", methods=['GET'])
 def get_rgb():
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("RGBlight")
         try:
@@ -124,7 +233,9 @@ def get_rgb():
 @app.route("/door", methods=['GET'])
 def get_door():
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("door", str(id), vector["door"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("door")
         try:
@@ -138,7 +249,9 @@ def get_door():
 @app.route("/air", methods=['GET'])
 def get_air():
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("air", str(id), vector["air"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("air")
         try:
@@ -153,7 +266,9 @@ def get_air():
 @app.route("/air/<id>/<on>", methods=['PATCH'])
 def patch_air_on(id,on):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("air", str(id), vector["air"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("air/"+str(id)+"/"+str(on))
 
@@ -168,7 +283,9 @@ def patch_air_on(id,on):
 @app.route("/air/<id>/<off>", methods=['PATCH'])
 def patch_air_off(id,off):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("air", str(id), vector["air"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("air/"+str(id)+"/"+str(off))
 
@@ -184,7 +301,9 @@ def patch_air_off(id,off):
 @app.route("/air/<id>/temperature/<temperature>", methods=['PATCH'])
 def patch_air_change_temperature(id,temperature):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("air", str(id), vector["air"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("air/"+str(id)+"/temperature/"+str(temperature))
 
@@ -200,7 +319,9 @@ def patch_air_change_temperature(id,temperature):
 @app.route("/RGBlight/<id>/<on>", methods=['PATCH'])
 def patch_RGB_on(id,on):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("RGBlight/"+str(id)+"/"+str(on))
 
@@ -217,7 +338,9 @@ def patch_RGB_on(id,on):
 @app.route("/RGBlight/<id>/<off>", methods=['PATCH'])
 def patch_RGB_off(id,off):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("RGBlight/"+str(id)+"/"+str(off))
 
@@ -233,7 +356,9 @@ def patch_RGB_off(id,off):
 @app.route("/RGBlight/<id>/color/<color>", methods=['PATCH'])
 def patch_change_RGBlight(id,color):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("RGBlight/"+str(id)+"/color/"+str(color))
 
@@ -249,7 +374,9 @@ def patch_change_RGBlight(id,color):
 @app.route("/door/<id>/<op>", methods=['PATCH'])
 def patch_open_door(id,op):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("door", str(id), vector["door"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("door/"+str(id)+"/"+str(op))
 
@@ -264,7 +391,9 @@ def patch_open_door(id,op):
 @app.route("/door/<id>/<cls>", methods=['PATCH'])
 def patch_close_door(id,cls):
     try:
-        tcp = TCP_SEND("127.0.0.1", 3000)
+        vector = ler_json()
+        v = get_port_by_id("door", str(id), vector["door"])
+        tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
         tcp.send_request("door/"+str(id)+"/"+str(cls))
 
@@ -290,4 +419,6 @@ def rout_request(topic, device_ip, device_port):
     
 
 if __name__ == "__main__":
+    thr = threading.Thread(target=connect_continuos, args=("127.0.0.1", 54020))
+    thr.start()
     app.run(debug=True)
