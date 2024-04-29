@@ -133,13 +133,22 @@ def acess_data_base(data,device):
     dev = []
     match len(data):
         case 1:
-            dev = device
+            if device.get_status() != "off":
+                dev = device.get_data()
+            else:
+                dev = "Dispositivo desligado"
         case 2:
-            dev = device.get_data()
+            if device.get_status() != "off":
+                dev = device.get_data()
+            else:
+                dev = "Dispositivo desligado"
         case 3:
             device.set_status(data[2])
         case 4:
-            device.set_data(data[3])        
+            if device.get_status() != "off":
+                device.set_data(data[3])
+            else:
+                dev = "Dispositivo desligado"        
         case _:
             pass
     return dev
@@ -177,19 +186,27 @@ def interface(device):
 
 if __name__ == "__main__":
     TCP_HOST = '0.0.0.0'
-    TCP_PORT = int(input("digite a porta TCP que deseja conectar"))
+    TCP_PORT = int(input("digite a porta TCP que deseja conectar: "))
 
     UDP_HOST = '0.0.0.0'
     UDP_PORT = 54310
-    
+    t_devices = ["air", "RGBlight", "door"]
     type = str(input("Digite o tipo de dispositivo: "))
-    id = int(input("digite o ID: "))
-   
-    d = device(type, id, TCP_HOST, TCP_PORT)
-    d.set_initial_params()
-    d.initial_sendo()
-    thr = threading.Thread(target=midleware_tcp_udp, args=(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT,d))
-    thr.start()
-    while True:
-        interface(d)
+    if type in t_devices:
+        id = int(input("digite o ID: "))
     
+        d = device(type, id, TCP_HOST, TCP_PORT)
+        d.set_initial_params()
+        d.initial_sendo()
+        thr = threading.Thread(target=midleware_tcp_udp, args=(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT,d))
+        thr.start()
+        while True:
+            interface(d)
+    else:
+        string = "Dispositivo invalido"
+        print(string)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
+            udp_socket.sendto(string.encode(), (UDP_HOST, UDP_PORT))
+            udp_socket.close()
+     
+        
