@@ -2,6 +2,7 @@ from flask import Flask, make_response, request, jsonify
 import socket
 import threading
 import json
+import os
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -73,8 +74,19 @@ def connect_continuos(host, port):
                     "door": devices_connections_door
                 }
 
-                with open("connections.json", "w") as file:
-                     json.dump(dados, file)
+                if os.path.getsize("connections.json"):
+
+                    formated_data = {
+                        "air": [list(connection) for connection in devices_connections_air],
+                        "RGBlight": [list(connection) for connection in devices_connections_rgb],
+                        "door": [list(connection) for connection in devices_connections_door]
+                    }
+                    with open("connections.json", "w") as file:
+                        json.dump(formated_data, file)
+                else:
+
+                    with open("connections.json", "w") as file:
+                        json.dump(dados, file)
                
 
 
