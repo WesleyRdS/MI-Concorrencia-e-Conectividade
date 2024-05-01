@@ -33,12 +33,16 @@ class TCP_SEND:
 def udp_server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
         udp.bind((host, port))
-
+        udp.settimeout(10)
         print(f"Conexão temporaria estabelecida com: {host}:{port}")
-        while True:
-            device_info, device_server_adress = udp.recvfrom(1024)
-            if device_info:
-                return device_info.decode()
+        try:
+            while True:
+                device_info, device_server_adress = udp.recvfrom(1024)
+                if device_info:
+                    return device_info.decode()
+        except socket.timeout:
+            return "Timeout: Resposta não recebida"
+
                 
 def connect_continuos(host, port):
     devices_connections_air = []
@@ -81,22 +85,20 @@ def DB_refactor(lt, devices_connections):
         match lt[0]:
             case "air":
                 for i in devices_connections:
-                    if i[1] == lt[1]:
+                    if i[1] == lt[1] or (i[2], i[3]) == (lt[2], lt[3]):
                         return
-                    if i[3] == lt[3]:
-                        return
-                    devices_connections.append(lt)
+                devices_connections.append(lt)
                         
             case "RGBlight":
                 for i in devices_connections:
-                    if i[1] == lt[1]:
+                    if i[1] == lt[1] or (i[2], i[3]) == (lt[2], lt[3]):
                         return
-                    devices_connections.append(lt)
+                devices_connections.append(lt)
             case "door":
                 for i in devices_connections:
-                    if i[1] == lt[1]:
+                    if i[1] == lt[1] or (i[2], i[3]) == (lt[2], lt[3]):
                         return
-                    devices_connections.append(lt) 
+                devices_connections.append(lt) 
             case _:
                 pass
     else:
@@ -156,6 +158,7 @@ def send_response():
         return success_response(udp_message)
     except:
         return error_response("Dado solicitado não recebido")
+    
 
 
 @app.route("/<string:topic>", methods=['PUT', 'GET'])
@@ -186,6 +189,8 @@ def get_rgb_id(id):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/door/<id>", methods=['GET'])
 def get_door_id(id):
@@ -202,6 +207,8 @@ def get_door_id(id):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/air/<id>/temperature", methods=['GET'])
 def get_air_id(id):
@@ -218,6 +225,8 @@ def get_air_id(id):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/RGBlight", methods=['GET'])
 def get_rgb():
@@ -234,6 +243,8 @@ def get_rgb():
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/door", methods=['GET'])
 def get_door():
@@ -250,6 +261,8 @@ def get_door():
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/air", methods=['GET'])
 def get_air():
@@ -266,6 +279,8 @@ def get_air():
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 @app.route("/air/<id>/<on>", methods=['PATCH'])
@@ -284,6 +299,8 @@ def patch_air_on(id,on):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/air/<id>/<off>", methods=['PATCH'])
 def patch_air_off(id,off):
@@ -301,6 +318,8 @@ def patch_air_off(id,off):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 @app.route("/air/<id>/temperature/<temperature>", methods=['PATCH'])
@@ -319,6 +338,8 @@ def patch_air_change_temperature(id,temperature):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 @app.route("/RGBlight/<id>/<on>", methods=['PATCH'])
@@ -337,6 +358,8 @@ def patch_RGB_on(id,on):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
         
 
 
@@ -356,6 +379,8 @@ def patch_RGB_off(id,off):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 @app.route("/RGBlight/<id>/color/<color>", methods=['PATCH'])
@@ -374,6 +399,8 @@ def patch_change_RGBlight(id,color):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 @app.route("/door/<id>/<op>", methods=['PATCH'])
@@ -392,6 +419,8 @@ def patch_open_door(id,op):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 @app.route("/door/<id>/<cls>", methods=['PATCH'])
 def patch_close_door(id,cls):
@@ -409,6 +438,8 @@ def patch_close_door(id,cls):
             return error_response("Dado solicitado não recebido")
     except IndexError:
         return error_response("ID do dispositivo inválido")
+    except TimeoutError:
+        return error_response("Tempo de solicitação excedido. Tente novamente")
 
 
 
