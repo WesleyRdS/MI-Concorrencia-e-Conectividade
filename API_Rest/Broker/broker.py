@@ -73,8 +73,9 @@ def connect_continuos(host, port):
                     "RGBlight": devices_connections_rgb,
                     "door": devices_connections_door
                 }
-
-                if os.path.getsize("connections.json"):
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                connections_file = os.path.join(script_dir, "connections.json")
+                if os.path.exists(connections_file) and os.path.getsize(connections_file) <= 0:
 
                     formated_data = {
                         "air": [list(connection) for connection in devices_connections_air],
