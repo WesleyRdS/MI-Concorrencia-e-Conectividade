@@ -49,7 +49,7 @@ class device:
     def initial_sendo(self):
         string = self.type+"/"+str(self.id)+"/"+self.host+"/"+str(self.port) 
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-            udp_socket.sendto(string.encode(), ("0.0.0.0", 54020))
+            udp_socket.sendto(string.encode(), ("127.0.0.1", 54020))
             udp_socket.close()
 
 

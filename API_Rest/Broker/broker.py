@@ -167,7 +167,7 @@ def error_response(message):
 @app.route("/response", methods=['GET'])
 def send_response():
     try:
-        udp_message = udp_server("127.0.0.1", 54310)
+        udp_message = udp_server("0.0.0.0", 54310)
         return success_response(udp_message)
     except:
         return error_response("Dado solicitado não recebido")
@@ -196,7 +196,7 @@ def get_rgb_id(id):
         tcp.connect()
         tcp.send_request("RGBlight/"+str(id))
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -214,7 +214,7 @@ def get_door_id(id):
         tcp.connect()
         tcp.send_request("door/"+str(id))
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -232,7 +232,7 @@ def get_air_id(id):
         tcp.connect()
         tcp.send_request("air/"+str(id))
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -250,7 +250,7 @@ def get_rgb():
         tcp.connect()
         tcp.send_request("RGBlight")
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -268,7 +268,7 @@ def get_door():
         tcp.connect()
         tcp.send_request("door")
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -286,7 +286,7 @@ def get_air():
         tcp.connect()
         tcp.send_request("air")
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -306,7 +306,7 @@ def patch_air_on(id,on):
         tcp.send_request("air/"+str(id)+"/"+str(on))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -325,7 +325,7 @@ def patch_air_off(id,off):
         tcp.send_request("air/"+str(id)+"/"+str(off))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -345,7 +345,7 @@ def patch_air_change_temperature(id,temperature):
         tcp.send_request("air/"+str(id)+"/temperature/"+str(temperature))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -365,7 +365,7 @@ def patch_RGB_on(id,on):
         tcp.send_request("RGBlight/"+str(id)+"/"+str(on))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -386,7 +386,7 @@ def patch_RGB_off(id,off):
         tcp.send_request("RGBlight/"+str(id)+"/"+str(off))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -406,7 +406,7 @@ def patch_change_RGBlight(id,color):
         tcp.send_request("RGBlight/"+str(id)+"/color/"+str(color))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -426,7 +426,7 @@ def patch_open_door(id,op):
         tcp.send_request("door/"+str(id)+"/"+str(op))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
@@ -445,7 +445,7 @@ def patch_close_door(id,cls):
         tcp.send_request("door/"+str(id)+"/"+str(cls))
 
         try:
-            udp_message = udp_server("127.0.0.1", 54310)
+            udp_message = udp_server("0.0.0.0", 54310)
             return success_response(udp_message)
         except:
             return error_response("Dado solicitado não recebido")
