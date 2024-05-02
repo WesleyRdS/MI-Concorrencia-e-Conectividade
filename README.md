@@ -6,31 +6,31 @@ No diretorio do projeto:
 
 1. Inicie o `broker.py`:
 
-python3 API_Rest/Broker/broker.py
+`python3 API_Rest/Broker/broker.py`
 
 2. Em seguida, inicie o `app_cliente.py`:
 
-python3 App/Client/app_cliente.py
+`python3 App/Client/app_cliente.py`
 
 Ele retornará uma exceção caso você tente se conectar a um dispositivo inexistente. Além disso, não será executado caso o broker esteja desligado. Se uma requisição demorar 10 segundos sem receber resposta, será exibido um erro de timeout.
 
 3. Por fim, inicie o `device_server.py`:
 
-python3 Devices/Simulator/device_server.py
+`python3 Devices/Simulator/device_server.py`
 
-No dispositivo, defina a porta. Evite usar as portas 5000, 54310 e 54020. Defina o tipo de dispositivo entre três opções: air, RGBlight, door. Em seguida, defina o seu ID. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
+No dispositivo, defina a porta. Evite usar as portas `5000, 54310 e 54020`. Defina o tipo de dispositivo entre três opções: `air, RGBlight, door`. Em seguida, defina o seu `ID`. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
 
-**OBS**: O Dockerfile está definido, mas ainda não está funcionando corretamente.
+**OBS**: O `Dockerfile` está definido, mas ainda não está funcionando corretamente.
 
-**OBS**: Esse projeto usa bibliotecas externas como Flask e Request. Se não tiver instalado em seu computador o codigo não vai funcionar.
+**OBS**: Esse projeto usa bibliotecas externas como `Flask` e `Request`. Se não tiver instalado em seu computador o codigo não vai funcionar.
 
-**OBS**: Esse projeto usa match case logo é preciso uma versão do python a partir da 3.10
+**OBS**: Esse projeto usa `match case` logo é preciso uma versão do `python` a partir da `3.10`
 
 Comandos para instalação:
 
-pip install Flask
+`pip install Flask`
 
-pip install requests
+`pip install requests`
 
 ----------------------------------------------------------------------------
 # Broker.Py
