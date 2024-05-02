@@ -22,6 +22,7 @@ No dispositivo, defina a porta. Evite usar as portas 5000, 54310 e 54020. Defina
 
 **OBS**: O Dockerfile está definido, mas ainda não está funcionando corretamente.
 **OBS**: Esse projeto usa bibliotecas externas como Flask e Request. Se não tiver instalado em seu computador o codigo não vai funcionar.
+**OBS**: Esse projeto usa match case logo é preciso uma versão do python a partir da 3.10
 
 Comandos para instalação:
 
