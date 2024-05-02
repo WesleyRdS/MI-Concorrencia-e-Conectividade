@@ -2,26 +2,42 @@
 
 Para iniciar, siga exatamente esta ordem:
 
-No diretorio do projeto:
+
+Inicie o terminal no diretorio do projeto:
 
 1. Inicie o `broker.py`:
+   
+a.`sudo docker buildx build -t broker .`(Docker)
+`sudo docker run --name container-broker --network host -it broker`
 
-`python3 API_Rest/Broker/broker.py`
+ou`
+
+b.`python3 API_Rest/Broker/broker.py`(IDE)
 
 2. Em seguida, inicie o `app_cliente.py`:
 
-`python3 App/Client/app_cliente.py`
+a.`sudo docker buildx build -t app .`(Docker)
+`sudo docker run --name container-app --network host -it app`
+
+ou
+
+b.`python3 App/Client/app_cliente.py`(IDE)
 
 Ele retornará uma exceção caso você tente se conectar a um dispositivo inexistente. Além disso, não será executado caso o broker esteja desligado. Se uma requisição demorar 10 segundos sem receber resposta, será exibido um erro de timeout.
 
 3. Por fim, inicie o `device_server.py`:
 
-`python3 Devices/Simulator/device_server.py`
+a.`sudo docker buildx build -t device .`(Docker)
+`sudo docker run --name container-device --network host -it device`
+
+ou
+
+b.`python3 Devices/Simulator/device_server.py`(IDE)
 
 No dispositivo, defina a porta. Evite usar as portas `5000, 54310 e 54020`. Defina o tipo de dispositivo entre três opções: `air, RGBlight, door`. Em seguida, defina o seu `ID`. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
 
-**OBS**: O `Dockerfile` está definido, mas ainda não está funcionando corretamente.
 
+As observações a seguir só precisam ser levadas em consideração se você for compilar o codigo na IDE
 **OBS**: Esse projeto usa bibliotecas externas como `Flask` e `Request`. Se não tiver instalado em seu computador o codigo não vai funcionar.
 
 **OBS**: Esse projeto usa `match case` logo é preciso uma versão do `python` a partir da `3.10`
