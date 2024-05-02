@@ -2,7 +2,7 @@
 
 Para iniciar, siga exatamente esta ordem:
 
-0.No diretorio do projeto:
+No diretorio do projeto:
 
 1. Inicie o `broker.py`:
 
