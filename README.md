@@ -79,6 +79,7 @@ Esta função recebe como parâmetro a requisição fornecida no request. É res
 ## app_machine
 
 Interface responsável por lidar com as entradas do usuário e definir qual rota deve ser enviada na requisição.
+
 -----------------------------------------------------------------------------
 
 # Device_server.py
