@@ -24,7 +24,9 @@ No dispositivo, defina a porta. Evite usar as portas 5000, 54310 e 54020. Defina
 **OBS**: Esse projeto usa bibliotecas externas como Flask e Request. Se não tiver instalado em seu computador o codigo não vai funcionar.
 
 Comandos para instalação:
+
 pip install Flask
+
 pip install requests
 
 ----------------------------------------------------------------------------
