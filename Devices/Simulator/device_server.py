@@ -80,7 +80,7 @@ def midleware_tcp_udp(tcp_host, tcp_port, udp_host, udp_port, device):
                 acess_data = handle_tcp_received(conn, addr)
                 s = acess_data_base(acess_data,device)
                 udp_return = str(s)
-                if udp_return != []:
+                if s != []:
                     try:
                         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
                             udp_socket.sendto(udp_return.encode(), (udp_host, udp_port))

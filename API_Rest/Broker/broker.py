@@ -34,7 +34,7 @@ class TCP_SEND:
 def udp_server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
         udp.bind((host, port))
-        udp.settimeout(10)
+        udp.settimeout(5)
         print(f"Conexão temporaria estabelecida com: {host}:{port}")
         try:
             while True:
