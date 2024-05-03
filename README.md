@@ -8,6 +8,7 @@ Inicie o terminal no diretorio do projeto:
 1. Inicie o `broker.py`:
    
 a.`sudo docker buildx build -t broker .`(Docker)
+
 `sudo docker run --name container-broker --network host -it broker`
 
 ou`
@@ -17,6 +18,7 @@ b.`python3 API_Rest/Broker/broker.py`(IDE)
 2. Em seguida, inicie o `app_cliente.py`:
 
 a.`sudo docker buildx build -t app .`(Docker)
+
 `sudo docker run --name container-app --network host -it app`
 
 ou
@@ -28,6 +30,7 @@ Ele retornará uma exceção caso você tente se conectar a um dispositivo inexi
 3. Por fim, inicie o `device_server.py`:
 
 a.`sudo docker buildx build -t device .`(Docker)
+
 `sudo docker run --name container-device --network host -it device`
 
 ou
