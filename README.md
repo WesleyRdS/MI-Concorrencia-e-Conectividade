@@ -3,7 +3,7 @@
 Para iniciar, siga exatamente esta ordem:
 
 
-Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você pode executalo na pasta raiz mas para o broker você tera que acessar a subpasta de cada um onde esta localizado a 'Dockerfile'):
+Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você pode executalo na pasta raiz mas para o broker você tera que acessar a subpasta de cada um onde esta localizado a `Dockerfile`):
 
 1. Inicie o `broker.py`:
    
