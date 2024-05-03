@@ -7,9 +7,9 @@ Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você 
 
 1. Inicie o `broker.py`:
    
-`a.sudo docker buildx build -t broker .`(Docker)
+`a.sudo docker buildx build -t broker .`(Cria a imagem Docker)
 
-`sudo docker run --name container-broker --network host -it broker`
+`sudo docker run --name container-broker --network host -it broker`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
@@ -17,9 +17,9 @@ Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você 
 
 2. Em seguida, inicie o `app_cliente.py`:
 
-`a.sudo docker buildx build -t app .`(Docker)
+`a.sudo docker buildx build -t app .`(Cria a imagem Docker)
 
-`sudo docker run --name container-app --network host -it app`
+`sudo docker run --name container-app --network host -it app`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
@@ -29,9 +29,9 @@ Ele retornará uma exceção caso você tente se conectar a um dispositivo inexi
 
 3. Por fim, inicie o `device_server.py`:
 
-`a.sudo docker buildx build -t device .`(Docker)
+`a.sudo docker buildx build -t device .`(Cria a imagem Docker)
 
-`sudo docker run --name container-device --network host -it device`
+`sudo docker run --name container-device --network host -it device`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
@@ -39,8 +39,10 @@ Ele retornará uma exceção caso você tente se conectar a um dispositivo inexi
 
 No dispositivo, defina a porta. Evite usar as portas `5000, 54310 e 54020`. Defina o tipo de dispositivo entre três opções: `air, RGBlight, door`. Em seguida, defina o seu `ID`. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
 
+**OBS**: Caso queira executar o container é necessario ter o docker instalado.
 
 As observações a seguir só precisam ser levadas em consideração se você for compilar o codigo na IDE
+
 **OBS**: Esse projeto usa bibliotecas externas como `Flask` e `Request`. Se não tiver instalado em seu computador o codigo não vai funcionar.
 
 **OBS**: Esse projeto usa `match case` logo é preciso uma versão do `python` a partir da `3.10`
