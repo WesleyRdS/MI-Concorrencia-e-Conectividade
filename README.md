@@ -7,35 +7,35 @@ Inicie o terminal no diretorio do projeto:
 
 1. Inicie o `broker.py`:
    
-a.`sudo docker buildx build -t broker .`(Docker)
+`a.sudo docker buildx build -t broker .`(Docker)
 
 `sudo docker run --name container-broker --network host -it broker`
 
-ou`
+`ou`
 
-b.`python3 API_Rest/Broker/broker.py`(IDE)
+`b.python3 API_Rest/Broker/broker.py`(IDE)
 
 2. Em seguida, inicie o `app_cliente.py`:
 
-a.`sudo docker buildx build -t app .`(Docker)
+`a.sudo docker buildx build -t app .`(Docker)
 
 `sudo docker run --name container-app --network host -it app`
 
-ou
+`ou`
 
-b.`python3 App/Client/app_cliente.py`(IDE)
+`b.python3 App/Client/app_cliente.py`(IDE)
 
 Ele retornará uma exceção caso você tente se conectar a um dispositivo inexistente. Além disso, não será executado caso o broker esteja desligado. Se uma requisição demorar 10 segundos sem receber resposta, será exibido um erro de timeout.
 
 3. Por fim, inicie o `device_server.py`:
 
-a.`sudo docker buildx build -t device .`(Docker)
+`a.sudo docker buildx build -t device .`(Docker)
 
 `sudo docker run --name container-device --network host -it device`
 
-ou
+`ou`
 
-b.`python3 Devices/Simulator/device_server.py`(IDE)
+`b.python3 Devices/Simulator/device_server.py`(IDE)
 
 No dispositivo, defina a porta. Evite usar as portas `5000, 54310 e 54020`. Defina o tipo de dispositivo entre três opções: `air, RGBlight, door`. Em seguida, defina o seu `ID`. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
 
