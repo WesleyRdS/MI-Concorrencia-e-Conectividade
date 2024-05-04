@@ -194,12 +194,16 @@ def get_rgb_id(id):
         v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("RGBlight/"+str(id))
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("RGBlight/"+str(id))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -212,12 +216,16 @@ def get_door_id(id):
         v = get_port_by_id("door", str(id), vector["door"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("door/"+str(id))
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("door/"+str(id))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -230,12 +238,16 @@ def get_air_id(id):
         v = get_port_by_id("air", str(id), vector["air"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("air/"+str(id))
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("air/"+str(id))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -248,12 +260,16 @@ def get_rgb():
         v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("RGBlight")
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("RGBlight")
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -266,12 +282,16 @@ def get_door():
         v = get_port_by_id("door", str(id), vector["door"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("door")
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("door")
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -284,12 +304,16 @@ def get_air():
         v = get_port_by_id("air", str(id), vector["air"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("air")
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("air")
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -303,13 +327,16 @@ def patch_air_on(id,on):
         v = get_port_by_id("air", str(id), vector["air"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("air/"+str(id)+"/"+str(on))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("air/"+str(id)+"/"+str(on))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -322,13 +349,16 @@ def patch_air_off(id,off):
         v = get_port_by_id("air", str(id), vector["air"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("air/"+str(id)+"/"+str(off))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("air/"+str(id)+"/"+str(off))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -342,13 +372,16 @@ def patch_air_change_temperature(id,temperature):
         v = get_port_by_id("air", str(id), vector["air"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("air/"+str(id)+"/temperature/"+str(temperature))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("air/"+str(id)+"/temperature/"+str(temperature))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -362,13 +395,16 @@ def patch_RGB_on(id,on):
         v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("RGBlight/"+str(id)+"/"+str(on))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("RGBlight/"+str(id)+"/"+str(on))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -383,13 +419,16 @@ def patch_RGB_off(id,off):
         v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("RGBlight/"+str(id)+"/"+str(off))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("RGBlight/"+str(id)+"/"+str(off))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -403,13 +442,16 @@ def patch_change_RGBlight(id,color):
         v = get_port_by_id("RGBlight", str(id), vector["RGBlight"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("RGBlight/"+str(id)+"/color/"+str(color))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("RGBlight/"+str(id)+"/color/"+str(color))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -423,13 +465,16 @@ def patch_open_door(id,op):
         v = get_port_by_id("door", str(id), vector["door"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("door/"+str(id)+"/"+str(op))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("door/"+str(id)+"/"+str(op))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
@@ -442,13 +487,16 @@ def patch_close_door(id,cls):
         v = get_port_by_id("door", str(id), vector["door"])
         tcp = TCP_SEND(v[0], v[1])
         tcp.connect()
-        tcp.send_request("door/"+str(id)+"/"+str(cls))
-
-        try:
-            udp_message = udp_server("0.0.0.0", 54310)
-            return success_response(udp_message)
-        except:
-            return error_response("Dado solicitado não recebido")
+        c = tcp.connected
+        if c == True:
+            tcp.send_request("door/"+str(id)+"/"+str(cls))
+            try:
+                udp_message = udp_server("0.0.0.0", 54310)
+                return success_response(udp_message)
+            except:
+                return error_response("Dado solicitado não recebido")
+        else:
+            return success_response("Dispositivo desconectado!")
     except IndexError:
         return error_response("ID do dispositivo inválido")
     except TimeoutError:
