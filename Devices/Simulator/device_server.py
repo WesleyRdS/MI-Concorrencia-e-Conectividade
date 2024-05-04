@@ -14,6 +14,7 @@ class device:
         self.port = port
         self.status = ""
         self.data = None
+        self.par = ""
     
     def set_initial_params(self):
         if self.type == "air" or self.type == "RGBlight":
@@ -25,10 +26,18 @@ class device:
         
         if self.type == "air":
             self.data = random.randint(10,35)
+            self.par = "Temperatura"
         else:
             l = ['azul', "vermelho","amarelo","verde","branca","violeta","ametista","laranja","azul"]
             self.data = random.choice(l)
+            self.par = "Cor da luz"
 
+    def get_par(self):
+        return self.par
+    
+    def set_par(self, i):
+        self.par = i
+    
     def get_status(self):
         return self.status
     
@@ -49,7 +58,7 @@ class device:
     def initial_sendo(self):
         string = self.type+"/"+str(self.id)+"/"+self.host+"/"+str(self.port) 
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-            udp_socket.sendto(string.encode(), ("127.0.0.1", 54020))
+            udp_socket.sendto(string.encode(), ("0.0.0.0", 54020))
             udp_socket.close()
 
 
@@ -144,13 +153,22 @@ def acess_data_base(data,device):
                 dev = "Dispositivo desligado"
         case 3:
             device.set_status(data[2])
+            if device.get_status() == data[2]:
+                dev = "Status do dispositivo: " + device.get_status()
+            else:
+                dev = "Falha na operação."
         case 4:
             if device.get_status() != "off":
+                aux = str(device.get_data())
                 device.set_data(data[3])
+                if str(device.get_data()) == str(data[3]):
+                    dev = "Alteração do parâmetro -" + device.get_par() + "- de: " + aux + " - Para: " + str(device.get_data())
+                else:
+                    dev = "Falha na operação."
             else:
                 dev = "Dispositivo desligado"        
         case _:
-            pass
+            dev = "A função passada não esta definida no sitema"
     return dev
 
 def interface(device):

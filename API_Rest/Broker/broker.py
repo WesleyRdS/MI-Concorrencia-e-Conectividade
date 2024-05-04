@@ -145,7 +145,7 @@ def get_port_by_id(type, id, dev):
                     ip.append(int(i[3]))
                     return ip
         case _:
-            print("dsfs")
+            return
 
 def ler_json():
     with open('connections.json', 'r') as file:
