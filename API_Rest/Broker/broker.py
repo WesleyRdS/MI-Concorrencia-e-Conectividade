@@ -166,8 +166,9 @@ def error_response(message):
 
 @app.route("/response", methods=['GET'])
 def send_response():
+    vector = ler_json()
     try:
-        udp_message = udp_server("0.0.0.0", 54310)
+        udp_message = str(vector)
         return success_response(udp_message)
     except:
         return error_response("Dado solicitado não recebido")
