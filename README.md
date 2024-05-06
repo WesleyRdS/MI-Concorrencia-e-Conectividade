@@ -140,11 +140,11 @@ Esta função é responsável por manipular a solicitação TCP enviada pelo Bro
 
 ## middleware_tcp_udp e access_database
 
-"Esta função desempenha um papel crucial na integração entre a recepção de requisições e o envio de respostas. Recebe como entrada os hosts e portas UDP e TCP, além do dispositivo em questão. É projetada para ser executada em uma thread. 
+Esta função desempenha um papel crucial na integração entre a recepção de requisições e o envio de respostas. Recebe como entrada os hosts e portas UDP e TCP, além do dispositivo em questão. É projetada para ser executada em uma thread. 
 
 Inicialmente, tenta criar um socket TCP e associá-lo aos hosts e portas fornecidos, definindo um limite de 5 usuários em espera. Em seguida, entra em um loop infinito para aceitar conexões e usar o retorno dessas conexões como parâmetro para a função responsável pelo tratamento das mensagens TCP recebidas. O resultado dessa função de tratamento é então passado como argumento para a função `access_database`, juntamente com o dispositivo relevante em execução. Esta função verifica o tamanho do vetor de dados retornado e, se não estiver vazio, retorna a informação associada a esse tamanho. Se o dispositivo estiver desligado, retorna essa condição. O retorno da função `access_database` é formatado como mensagem UDP, que será enviada ao broker. Esta mensagem é transformada em uma string antes do envio. Caso a mensagem não esteja vazia, tenta-se criar um socket UDP para enviar a mensagem, fechando o socket logo em seguida. 
 
-Em caso de exceções, como erros ou timeouts, são enviadas mensagens específicas indicando a natureza do problema encontrado durante o processamento da requisição."
+Em caso de exceções, como erros ou timeouts, são enviadas mensagens específicas indicando a natureza do problema encontrado durante o processamento da requisição.
 
 ## Interface
 
