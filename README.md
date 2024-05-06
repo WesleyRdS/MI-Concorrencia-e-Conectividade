@@ -54,9 +54,18 @@ Comandos para instalação:
 `pip install requests`
 
 ----------------------------------------------------------------------------
+# Introdução
+
+O projeto apresenta um sistema distribuído que facilita a comunicação entre uma aplicação e diversos dispositivos simulados, proporcionando uma arquitetura distribuída eficiente e escalável. O objetivo principal é permitir que a aplicação envie requisições HTTP via API Rest para um Service Broker, que por sua vez encaminha essas requisições para dispositivos específicos usando TCP socket. Após o processamento pelo dispositivo, o Broker aguarda uma resposta via UDP socket e a retorna para a aplicação.
+
+O projeto é composto por três principais componentes: 
+- O Broker, responsável pela comunicação entre a aplicação e os dispositivos.
+- A aplicação do cliente, que realiza requisições HTTP para o Broker
+- As simulções de dispositivo IOT. Para esse prototipo existem três tipos de dispositivos disponiveis: Ar condicionado, Luz RGB e Porta automática.
+
 # Broker.Py
 
-O Broker é um middleware que implementa uma API Rest utilizando Flask. Ele recebe requisições HTTPS e as encaminha para um dispositivo específico via TCP socket. O dispositivo é selecionado com base nos endpoints da requisição. O Broker aguarda uma resposta via UDP socket e a envia de volta para a aplicação.
+O Broker utiliza Flask para implementar uma API Rest, usando as rotas como tópicos para direcionar as requisições para os dispositivos corretos ultilizado endpoints especificos. Ele também gerencia as respostas recebidas dos dispositivos e as retorna para a aplicação cliente. Além disso, há funcionalidades como manipulação de erros e sucesso nas respostas, e métodos para obter a porta com base no ID do dispositivo.
 
 ## Classe TCP_SEND
 
@@ -89,9 +98,17 @@ Este serviço de Broker utiliza as rotas fornecidas pelo Flask como tópicos. Es
 
 Este arquivo implementa a aplicação do cliente responsável por fazer requisições HTTP para o broker. Ele importa a biblioteca `requests` do Python e utiliza o localhost na porta 5000, que é o padrão do Flask. Como mencionado anteriormente, no Broker, apenas os métodos GET e PATCH são necessários para a API REST. Todos os requests seguem o mesmo padrão de chave: a URL base, seguida pelo tipo de dispositivo e o ID do dispositivo desejado. Essa é a chave para obter cada item do banco de dados. Para se inscrever nos "tópicos", são necessários alguns endpoints além da chave padrão. No caso de ligar e desligar o ar ou a luz, é necessário adicionar "/on" ou "/off" a essa chave, respectivamente, e para a porta serial, "open" ou "close". Neste caso, é utilizado o método PATCH. Especificamente para a luz RGB e o ar condicionado, o método GET é utilizado para obter a cor e a temperatura dos dispositivos mencionados, respectivamente. Para o ar, é necessário adicionar "/temperature" e para a luz, "/color". Se ainda for necessário alterar o valor da temperatura ou mudar a cor, adiciona-se mais um endpoint com um "/", seguido do valor da temperatura (inteiro) ou cor desejada, respectivamente. Novamente, neste caso, é utilizado o método PATCH. Isso resume o formato de todas as requisições possíveis de serem utilizadas.
 
+## Class app
+
+Esta classe existe principalmente para gerenciar o número de novos dispositivos de cada tipo conectados. Ela possui um parâmetro para cada tipo de dispositivo e os métodos get e set correspondentes a cada um deles. Esses métodos serão utilizados na função "device_connect", que será explicada no próximo tópico.
+
+## device_connect
+
+Essa função, denominada `device_connect`, tem como objetivo identificar e retornar os novos dispositivos conectados à rede. Recebendo como parâmetros uma string contendo os dados dos dispositivos conectados e uma instância da classe `app`, que fornece o número de dispositivos conectados de cada tipo. Primeiramente, a função converte a string em um dicionário utilizando a biblioteca `ast.literal_eval`. Em seguida, ela compara o número de dispositivos de cada tipo presentes no dicionário com os números previamente registrados pela instância da classe `app`. Se houver um aumento no número de dispositivos de um determinado tipo, a função atualiza o contador correspondente na instância da classe `app` e retorna uma mensagem indicando a nova conexão.
+
 ## response_receiver
 
-Esta função utiliza o método GET para fazer uma requisição, passando como endpoint "/response", um tópico para uma resposta genérica fora das respostas padrões. É iniciado com uma thread e é usado para indicar que um novo dispositivo está disponível.
+Esta função utiliza o método GET para realizar uma requisição, utilizando "/response" como endpoint para obter novas conexões. Ela recebe uma instância do dispositivo como parâmetro e a utiliza para chamar a função `device_connect`, passando o dispositivo como parâmetro junto com a resposta recebida do servidor. A função armazena a resposta retornada em uma string e, caso não esteja vazia, imprime esse retorno. Ela usa um timer da threads para chamar a sí propria depois de um determinado periodo para que possa sempre detectar quando um novo dispositivo se conectar.
 
 ## handle_response
 
@@ -99,17 +116,23 @@ Esta função recebe como parâmetro a requisição fornecida no request. É res
 
 ## app_machine
 
-Interface responsável por lidar com as entradas do usuário e definir qual rota deve ser enviada na requisição.
+Interface responsável por lidar com as entradas do usuário e definir qual rota deve ser enviada na requisição. 
 
------------------------------------------------------------------------------
+## execute
+
+Esta função visa garantir a continuidade da execução da aplicação mesmo quando a conexão com o broker é interrompida ou se ocorre uma entrada incorreta de dados. Ela utiliza exceções para manter um loop de tentativas de interface com o usuário, permitindo que este escolha entre tentar reconectar-se ou encerrar o dispositivo em caso de falha.
+
+Esta função é crucial para garantir a robustez da aplicação em cenários adversos, mantendo-a em funcionamento mesmo diante de desafios na conexão ou interação com o usuário.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Device_server.py
 
-O Device_server é responsável por implementar um simulador capaz de assumir o formato de três tipos de dispositivos: Ar condicionado, Luz RGB e Porta automática.
+O Device_server é responsável por implementar um simulador capaz de assumir o formato de três tipos de dispositivos: Ar condicionado, Luz RGB e Porta automática. Ele também possui uma interface de terminal para interação direta com os dispositivos.
 
 ## Classe Device
 
-Esta classe contém os atributos do tipo de dispositivo, ID, host, porta, status e os dados de retorno. Além disso, possui as funções `set_initial_params`, que verifica o tipo de dispositivo e modifica o tipo de status apresentado e os dados retornados, bem como as funções `get` e `set` para obter e alterar os parâmetros, como é comum em programação orientada a objetos. A função principal da classe é `initial_send`, que concatena as informações de tipo, ID, host e porta em uma string e envia por UDP para o broker.
+Esta classe encapsula os atributos essenciais de um dispositivo, incluindo o tipo, ID, host, porta, status e os dados associados. Ela oferece o método `set_initial_params`, que ajusta dinamicamente o status e os dados dependendo do tipo de dispositivo. Além disso, disponibiliza métodos `get` e `set` para acessar e modificar esses parâmetros, seguindo o paradigma da programação orientada a objetos. O principal propósito da classe é a função `initial_send`, que constrói uma string concatenada contendo informações sobre o tipo, ID, host e porta do dispositivo, e a envia via UDP para o broker.
 
 ## handle_tcp_received
 
@@ -117,7 +140,11 @@ Esta função é responsável por manipular a solicitação TCP enviada pelo Bro
 
 ## middleware_tcp_udp e access_database
 
-Essa função integra a obtenção da requisição com o envio da resposta. Recebe como parâmetros os hosts e portas UDP e TCP e o dispositivo em questão. É executada em uma thread. Começa tentando criar um socket TCP e associando-o às portas passadas, definindo o limite de 5 usuários em espera. Em seguida, há um loop infinito que pega essa conexão e usa seu retorno como parâmetro da função que manipula o recebimento de mensagens TCP. O retorno dessa função se torna parâmetro para a função `access_database`, juntamente com o dispositivo em execução. Esta função verifica o tamanho do vetor de dados e retorna a informação associada àquele tamanho, ou então, caso o dispositivo esteja desligado, retorna esse fato. Esse retorno é a mensagem UDP que será enviada ao broker. A mensagem é transformada em string, e se não estiver vazia, tenta criar o socket e envia essa string, fechando o socket logo depois. Caso ocorram exceções de erro e timeout, são enviadas mensagens específicas caso os dados não venham da forma esperada.
+"Esta função desempenha um papel crucial na integração entre a recepção de requisições e o envio de respostas. Recebe como entrada os hosts e portas UDP e TCP, além do dispositivo em questão. É projetada para ser executada em uma thread. 
+
+Inicialmente, tenta criar um socket TCP e associá-lo aos hosts e portas fornecidos, definindo um limite de 5 usuários em espera. Em seguida, entra em um loop infinito para aceitar conexões e usar o retorno dessas conexões como parâmetro para a função responsável pelo tratamento das mensagens TCP recebidas. O resultado dessa função de tratamento é então passado como argumento para a função `access_database`, juntamente com o dispositivo relevante em execução. Esta função verifica o tamanho do vetor de dados retornado e, se não estiver vazio, retorna a informação associada a esse tamanho. Se o dispositivo estiver desligado, retorna essa condição. O retorno da função `access_database` é formatado como mensagem UDP, que será enviada ao broker. Esta mensagem é transformada em uma string antes do envio. Caso a mensagem não esteja vazia, tenta-se criar um socket UDP para enviar a mensagem, fechando o socket logo em seguida. 
+
+Em caso de exceções, como erros ou timeouts, são enviadas mensagens específicas indicando a natureza do problema encontrado durante o processamento da requisição."
 
 ## Interface
 
