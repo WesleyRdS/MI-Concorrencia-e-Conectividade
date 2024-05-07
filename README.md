@@ -2,14 +2,25 @@
 
 Para iniciar, siga exatamente esta ordem:
 
+### Pull da imagem do Docker Hub
+
+1. No terminal digite o comando: `docker pull wesleyrds/broker:TAG`
+2.                               `docker run --network host -it wesleyrds/broker:TAG`
+3. No terminal digite o comando: `docker pull wesleyrds/device:TAG`
+4.                               `docker run --network host -it wesleyrds/device:TAG`
+5. No terminal digite o comando: `docker pull wesleyrds/app:TAG`
+6.                               `docker run --network host -it wesleyrds/app:TAG`
+
+
+### Para gerar a imagem direto no seu PC ou executar em uma IDE
 
 Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você pode executalo na pasta raiz mas para o broker você tera que acessar a subpasta de cada um onde esta localizado a `Dockerfile`):
 
 1. Inicie o `broker.py`:
    
-`a.sudo docker buildx build -t broker .`(Cria a imagem Docker)
+`a.docker buildx build -t broker .`(Cria a imagem Docker)
 
-`sudo docker run --name container-broker --network host -it broker`(Cria um container a partir da imagem e o executa)
+`docker run --name container-broker --network host -it broker`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
@@ -17,9 +28,9 @@ Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você 
 
 2. Em seguida, inicie o `app_cliente.py`:
 
-`a.sudo docker buildx build -t app .`(Cria a imagem Docker)
+`a.docker buildx build -t app .`(Cria a imagem Docker)
 
-`sudo docker run --name container-app --network host -it app`(Cria um container a partir da imagem e o executa)
+`docker run --name container-app --network host -it app`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
@@ -29,9 +40,9 @@ Ele retornará uma exceção caso você tente se conectar a um dispositivo inexi
 
 3. Por fim, inicie o `device_server.py`:
 
-`a.sudo docker buildx build -t device .`(Cria a imagem Docker)
+`a.docker buildx build -t device .`(Cria a imagem Docker)
 
-`sudo docker run --name container-device --network host -it device`(Cria um container a partir da imagem e o executa)
+`docker run --name container-device --network host -it device`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
