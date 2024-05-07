@@ -148,11 +148,14 @@ def get_port_by_id(type, id, dev):
             return
 
 def ler_json():
-    with open('connections.json', 'r') as file:
-    # Carregar o conteúdo do arquivo em uma lista Python
-        lista_rgb = json.load(file)
-    
-    return lista_rgb
+    try:
+        with open('connections.json', 'r') as file:
+        # Carregar o conteúdo do arquivo em uma lista Python
+            lista_rgb = json.load(file)
+        
+        return lista_rgb
+    except:
+        return {}
 
 
 def success_response(data=None):
