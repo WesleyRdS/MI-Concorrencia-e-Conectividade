@@ -1,5 +1,5 @@
 
-FROM python:3
+FROM python:3.12-slim
 
 
 WORKDIR /Broker
@@ -11,7 +11,7 @@ COPY . .
 RUN pip install flask
 
 
-EXPOSE 5000
+EXPOSE 9985
 EXPOSE 54310
 EXPOSE 54020
 

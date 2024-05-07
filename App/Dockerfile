@@ -1,5 +1,5 @@
 
-FROM python:3
+FROM python:3.12-slim
 
 
 WORKDIR /Client
@@ -10,6 +10,6 @@ COPY . .
 
 RUN pip install requests
 
-EXPOSE 5000
+EXPOSE 9985
 
 CMD ["python", "Client/app_cliente.py"]

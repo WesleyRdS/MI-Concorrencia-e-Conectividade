@@ -522,4 +522,4 @@ def rout_request(topic, device_ip, device_port):
 if __name__ == "__main__":
     thr = threading.Thread(target=connect_continuos, args=("127.0.0.1", 54020))
     thr.start()
-    app.run(debug=True)
+    app.run(port=9985, debug=True)

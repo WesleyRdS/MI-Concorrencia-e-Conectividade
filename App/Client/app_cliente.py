@@ -2,7 +2,7 @@ import requests
 import os
 import threading
 import ast
-base_url = "http://localhost:5000"
+base_url = "http://0.0.0.0:9985"
 
 class app:
     def __init__(self):
