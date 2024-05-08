@@ -2,7 +2,18 @@ import requests
 import os
 import threading
 import ast
-base_url = "http://0.0.0.0:9985"
+
+
+
+def get_end_broker():
+    try:
+        h = str(input("Digite o endereço IP do broker: "))
+        return h
+    except:
+        print("Endereço invalido")
+        get_end_broker()
+    
+base_url = "http://"+get_end_broker()+":9985"
 
 class app:
     def __init__(self):
