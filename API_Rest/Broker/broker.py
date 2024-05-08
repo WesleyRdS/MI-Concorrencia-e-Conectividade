@@ -520,7 +520,11 @@ def rout_request(topic, device_ip, device_port):
     
 
 if __name__ == "__main__":
-    h = str(input("Digite o endereço ao qual deseja se conectar: "))
+    try:
+        h = str(input("Digite o endereço ao qual deseja se conectar: "))
+    except:
+        print("Porta invalida. Usando porta padrão 0.0.0.0")
+        h = "0.0.0.0"
     thr = threading.Thread(target=connect_continuos, args=("127.0.0.1", 54020))
     thr.start()
     app.run(host= h, port=9985, debug=True)
