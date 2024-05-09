@@ -30,6 +30,8 @@ class TCP_SEND:
     def send_request(self,message):
         if self.connected:
             self.socket_tcp.sendall(message.encode())
+            self.socket_tcp.close()
+            self.connected = False
 
 def udp_server(host, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp:
@@ -40,6 +42,7 @@ def udp_server(host, port):
             while True:
                 device_info, device_server_adress = udp.recvfrom(1024)
                 if device_info:
+                    udp.close()
                     return device_info.decode()
         except socket.timeout:
             return "Timeout: Resposta não recebida"
@@ -150,7 +153,7 @@ def get_port_by_id(type, id, dev):
 def ler_json():
     try:
         with open('connections.json', 'r') as file:
-        # Carregar o conteúdo do arquivo em uma lista Python
+
             lista_rgb = json.load(file)
         
         return lista_rgb
@@ -525,6 +528,6 @@ if __name__ == "__main__":
     except:
         print("Porta invalida. Usando porta padrão 0.0.0.0")
         h = "0.0.0.0"
-    thr = threading.Thread(target=connect_continuos, args=("127.0.0.1", 54020))
+    thr = threading.Thread(target=connect_continuos, args=(h, 54020))
     thr.start()
     app.run(host= h, port=9985, debug=True)

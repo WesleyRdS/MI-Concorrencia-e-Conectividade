@@ -55,10 +55,10 @@ class device:
         else:
             pass
 
-    def initial_sendo(self):
+    def initial_sendo(self,s):
         string = self.type+"/"+str(self.id)+"/"+self.host+"/"+str(self.port) 
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
-            udp_socket.sendto(string.encode(), ("0.0.0.0", 54020))
+            udp_socket.sendto(string.encode(), (s, 54020))
             udp_socket.close()
 
 
@@ -203,10 +203,10 @@ def interface(device):
     
 
 if __name__ == "__main__":
-    TCP_HOST = '0.0.0.0'
+    TCP_HOST = str(input("Digite o endereço IP do servidor UDP(No formato - 0.0.0.0): "))
     TCP_PORT = int(input("digite a porta TCP que deseja conectar: "))
 
-    UDP_HOST = '0.0.0.0'
+    UDP_HOST = str(input("Digite o endereço IP do servidor UDP(No formato - 0.0.0.0): "))
     UDP_PORT = 54310
     t_devices = ["air", "RGBlight", "door"]
     type = str(input("Digite o tipo de dispositivo: "))
@@ -215,7 +215,7 @@ if __name__ == "__main__":
     
         d = device(type, id, TCP_HOST, TCP_PORT)
         d.set_initial_params()
-        d.initial_sendo()
+        d.initial_sendo(UDP_HOST)
         thr = threading.Thread(target=midleware_tcp_udp, args=(TCP_HOST, TCP_PORT, UDP_HOST, UDP_PORT,d))
         thr.start()
         while True:
