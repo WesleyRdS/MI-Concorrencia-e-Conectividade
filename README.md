@@ -74,6 +74,13 @@ O projeto é composto por três principais componentes:
 - A aplicação do cliente, que realiza requisições HTTP para o Broker
 - As simulções de dispositivo IOT. Para esse prototipo existem três tipos de dispositivos disponiveis: Ar condicionado, Luz RGB e Porta automática.
 
+# Tecnologias ultilizadas:
+
+1. Python 3.12
+2. Microframework flask para implementação da API
+3. Bibliotecas: Socket, Request, Thread, json e os
+4. Postman para o teste das rotas.
+
 # Broker.Py
 
 O Broker utiliza Flask para implementar uma API Rest, usando as rotas como tópicos para direcionar as requisições para os dispositivos corretos ultilizado endpoints especificos. Ele também gerencia as respostas recebidas dos dispositivos e as retorna para a aplicação cliente. Além disso, há funcionalidades como manipulação de erros e sucesso nas respostas, e métodos para obter a porta com base no ID do dispositivo.
