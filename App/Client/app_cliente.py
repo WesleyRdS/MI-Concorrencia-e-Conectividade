@@ -5,15 +5,9 @@ import ast
 
 
 
-def get_end_broker():
-    try:
-        h = str(input("Digite o endereço IP do broker: "))
-        return h
-    except:
-        print("Endereço invalido")
-        get_end_broker()
+IP = os.getenv("IP")
     
-base_url = "http://"+get_end_broker()+":9985"
+base_url = "http://"+IP+":9985"
 
 class app:
     def __init__(self):

@@ -3,8 +3,10 @@ import socket
 
 import threading
 import random
+import os
 
-
+UDP_HOST = os.getenv("UDP_HOST")
+TCP_HOST = os.getenv("TCP_HOST")
 
 class device:
     def __init__(self,type, id, host, port) -> None:
@@ -203,10 +205,9 @@ def interface(device):
     
 
 if __name__ == "__main__":
-    TCP_HOST = str(input("Digite o endereço IP do servidor UDP(No formato - 0.0.0.0): "))
+
     TCP_PORT = int(input("digite a porta TCP que deseja conectar: "))
 
-    UDP_HOST = str(input("Digite o endereço IP do servidor UDP(No formato - 0.0.0.0): "))
     UDP_PORT = 54310
     t_devices = ["air", "RGBlight", "door"]
     type = str(input("Digite o tipo de dispositivo: "))
