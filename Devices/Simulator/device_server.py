@@ -4,6 +4,7 @@ import socket
 import threading
 import random
 import os
+import sys
 
 UDP_HOST = os.getenv("UDP_HOST")
 TCP_HOST = os.getenv("TCP_HOST")
@@ -179,14 +180,18 @@ def interface(device):
     j = int(input("Digite o numero da opção que deseja selecionar: "))
     match j:
         case 1:
-            if device.get_status == "on":
+            if device.get_status() == "on":
                 device.set_status("off")
-            elif device.get_status == "off":
+                print("Status: "+device.get_status())
+            elif device.get_status() == "off":
                 device.set_status("on")
-            elif device.get_status == "open":
+                print("Status: "+device.get_status())
+            elif device.get_status() == "open":
                 device.set_status("close")
-            elif device.get_status == "close":
+                print("Status: "+device.get_status())
+            elif device.get_status() == "close":
                 device.set_status("open")
+                print("Status: "+device.get_status())
             else:
                 pass
             return
@@ -194,7 +199,7 @@ def interface(device):
             if device.type == "air":
                 i = int(input("Digite a temperatura desejada: "))
                 device.set_data(str(i))
-            elif device.type == "air":
+            elif device.type == "RGBlight":
                 i = str(input("Digite a cor desejada: "))
                 device.set_data(i)
             else:
@@ -203,16 +208,26 @@ def interface(device):
         case _:
             return
     
+def restart():
+    exe = sys.executable
+    os.execl(exe, exe, *sys.argv)
 
 if __name__ == "__main__":
-
-    TCP_PORT = int(input("digite a porta TCP que deseja conectar: "))
+    try:
+        TCP_PORT = int(input("digite a porta TCP que deseja conectar: "))
+    except:
+        print("Porta invalida. Reiniciando a aplicação....")
+        restart()
 
     UDP_PORT = 54310
     t_devices = ["air", "RGBlight", "door"]
     type = str(input("Digite o tipo de dispositivo: "))
     if type in t_devices:
-        id = int(input("digite o ID: "))
+        try:
+            id = int(input("digite o ID: "))
+        except:
+            print("ID invalido. Reiniciando a aplicação..")
+            restart()
     
         d = device(type, id, TCP_HOST, TCP_PORT)
         d.set_initial_params()

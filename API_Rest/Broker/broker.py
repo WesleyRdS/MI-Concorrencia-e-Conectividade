@@ -1,8 +1,10 @@
 from flask import Flask, make_response, request, jsonify
 import socket
+from werkzeug.serving import run_simple
 import threading
 import json
 import os
+import sys
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -509,7 +511,14 @@ def patch_close_door(id,cls):
     except TimeoutError:
         return error_response("Tempo de solicitação excedido. Tente novamente")
 
+def restart():
+    exe = sys.executable
+    os.execl(exe, exe, *sys.argv)
 
+@app.route('/restart', methods=['POST'])
+def restart():
+    exe = sys.executable
+    os.execl(exe, exe, *sys.argv)
 
 def rout_request(topic, device_ip, device_port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -525,4 +534,4 @@ def rout_request(topic, device_ip, device_port):
 if __name__ == "__main__":
     thr = threading.Thread(target=connect_continuos, args=(IP, 54020))
     thr.start()
-    app.run(host= IP, port=9985, debug=True)
+    run_simple(IP, 9985, app)

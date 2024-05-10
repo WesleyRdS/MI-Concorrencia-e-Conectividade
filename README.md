@@ -5,11 +5,11 @@ Para iniciar, siga exatamente esta ordem:
 ### Pull da imagem do Docker Hub
 
 1. No terminal digite o comando: `docker pull wesleyrds/broker:TAG`
-2.                               `docker run --network host -it wesleyrds/broker:TAG`
+2.                               `docker run -e IP=ip_da_maquina --network host -it wesleyrds/broker:TAG`
 3. No terminal digite o comando: `docker pull wesleyrds/device:TAG`
-4.                               `docker run --network host -it wesleyrds/device:TAG`
+4.                               `docker run -e UDP_HOST=ip_do_broker -e TCP_HOST=ip_da_maquina --network host -it wesleyrds/device:TAG`
 5. No terminal digite o comando: `docker pull wesleyrds/app:TAG`
-6.                               `docker run --network host -it wesleyrds/app:TAG`
+6.                               `docker run -e IP=ip_do_broker --network host -it wesleyrds/app:TAG`
 
 
 ### Para gerar a imagem direto no seu PC ou executar em uma IDE
@@ -20,21 +20,21 @@ Inicie o terminal no diretorio do projeto(Para a execução direto na IDE você 
    
 `a.docker buildx build -t broker .`(Cria a imagem Docker)
 
-`docker run --name container-broker --network host -it broker`(Cria um container a partir da imagem e o executa)
+`docker run -e IP=ip_da_maquina --name container-broker --network host -it broker`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
-`b.python3 API_Rest/Broker/broker.py`(IDE)
+`b.IP=ip_da_maquina python3 API_Rest/Broker/broker.py`(IDE)
 
 2. Em seguida, inicie o `app_cliente.py`:
 
 `a.docker buildx build -t app .`(Cria a imagem Docker)
 
-`docker run --name container-app --network host -it app`(Cria um container a partir da imagem e o executa)
+`docker run -e IP=ip_do_broker --name container-app --network host -it app`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
-`b.python3 App/Client/app_cliente.py`(IDE)
+`b.IP=ip_do_broker python3 App/Client/app_cliente.py`(IDE)
 
 Ele retornará uma exceção caso você tente se conectar a um dispositivo inexistente. Além disso, não será executado caso o broker esteja desligado. Se uma requisição demorar 10 segundos sem receber resposta, será exibido um erro de timeout.
 
@@ -42,11 +42,11 @@ Ele retornará uma exceção caso você tente se conectar a um dispositivo inexi
 
 `a.docker buildx build -t device .`(Cria a imagem Docker)
 
-`docker run --name container-device --network host -it device`(Cria um container a partir da imagem e o executa)
+`docker run -e UDP_HOST=ip_do_broker -e TCP_HOST=ip_da_maquina --name container-device --network host -it device`(Cria um container a partir da imagem e o executa)
 
 `ou`
 
-`b.python3 Devices/Simulator/device_server.py`(IDE)
+`b.UDP_HOST=ip_do_broker  TCP_HOST=127.0.0.1 python3 Devices/Simulator/device_server.py`(IDE)
 
 No dispositivo, defina a porta. Evite usar as portas `5000, 54310 e 54020`. Defina o tipo de dispositivo entre três opções: `air, RGBlight, door`. Em seguida, defina o seu `ID`. Dispositivos com tipos e IDs ou portas iguais serão iniciados, mas não se conectarão ao broker.
 

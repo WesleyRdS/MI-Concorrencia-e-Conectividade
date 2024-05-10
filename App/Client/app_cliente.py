@@ -46,11 +46,15 @@ def device_connect(string, device):
         pass
 
 def response_received(device):
-    response = requests.get(f"{base_url}/response")
-    string = response.json()
-    resp = device_connect(string, device)
-    if resp != None:
-        print(resp)
+    try:
+        response = requests.get(f"{base_url}/response")
+        string = response.json()
+        resp = device_connect(string, device)
+        if resp != None:
+            print(resp)
+    except:
+        response = requests.get(f"{base_url}/restart")
+        handle_response(response)
     threading.Timer(10,response_received, args=[device]).start()
     
 
