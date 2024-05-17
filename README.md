@@ -5,11 +5,11 @@ Para iniciar, siga exatamente esta ordem:
 ### Pull da imagem do Docker Hub
 
 1. No terminal digite o comando: `docker pull wesleyrds/broker:TAG`
-2.                               `docker run -e IP=ip_da_maquina --network host -it wesleyrds/broker:TAG`
+2.`docker run -e IP=ip_da_maquina --network host -it wesleyrds/broker:TAG`
 3. No terminal digite o comando: `docker pull wesleyrds/device:TAG`
-4.                               `docker run -e UDP_HOST=ip_do_broker -e TCP_HOST=ip_da_maquina --network host -it wesleyrds/device:TAG`
+4.`docker run -e UDP_HOST=ip_do_broker -e TCP_HOST=ip_da_maquina --network host -it wesleyrds/device:TAG`
 5. No terminal digite o comando: `docker pull wesleyrds/app:TAG`
-6.                               `docker run -e IP=ip_do_broker --network host -it wesleyrds/app:TAG`
+6.`docker run -e IP=ip_do_broker --network host -it wesleyrds/app:TAG`
 
 
 ### Para gerar a imagem direto no seu PC ou executar em uma IDE
@@ -74,6 +74,8 @@ O projeto é composto por três principais componentes:
 - A aplicação do cliente, que realiza requisições HTTP para o Broker
 - As simulções de dispositivo IOT. Para esse prototipo existem três tipos de dispositivos disponiveis: Ar condicionado, Luz RGB e Porta automática.
 
+![Protocolo de comunicação](images/DiagramaGeral.png)
+
 # Tecnologias ultilizadas:
 
 1. Python 3.12
@@ -110,11 +112,15 @@ Esta função obtém a porta a partir do dicionário de dispositivos, utilizando
 
 Este serviço de Broker utiliza as rotas fornecidas pelo Flask como tópicos. Essas rotas usam os endpoints como parâmetros para que o dispositivo que recebe a solicitação possa saber qual ação tomar. Existem rotas para respostas gerais, dispositivos de ar condicionado, luz RGB e portas. Nesta API Rest, só foi necessário o uso dos métodos GET para obtenção de valores e PATCH para alteração. Os tópicos de dispositivos, ou seja, suas rotas, seguem sempre a mesma lógica: ler um arquivo JSON com a função `ler_json` e armazenar o dicionário lido numa variável. Esta variável é passada como parâmetro da função `get_port_by_id`, juntamente com os outros parâmetros necessários, já mencionados anteriormente. A tupla retornada é utilizada para iniciar a classe `TCP_SEND` e estabelecer comunicação com o dispositivo, enviando a requisição para o mesmo. Tenta-se receber uma resposta; se obtida, utiliza-se a função de resposta bem-sucedida para enviá-la; caso contrário, envia-se uma mensagem de dados não recebidos utilizando a função de erro `response`. Em caso de falha, indica-se um erro de índice caso o ID do dispositivo seja inválido ou um erro de tempo de resposta caso exceda o limite máximo.
 
+![Comunicação dos topicos](images/API-BROKER.png)
+
 -----------------------------------------------------------------------------
 
 # app_cliente.py
 
 Este arquivo implementa a aplicação do cliente responsável por fazer requisições HTTP para o broker. Ele importa a biblioteca `requests` do Python e utiliza o localhost na porta 5000, que é o padrão do Flask. Como mencionado anteriormente, no Broker, apenas os métodos GET e PATCH são necessários para a API REST. Todos os requests seguem o mesmo padrão de chave: a URL base, seguida pelo tipo de dispositivo e o ID do dispositivo desejado. Essa é a chave para obter cada item do banco de dados. Para se inscrever nos "tópicos", são necessários alguns endpoints além da chave padrão. No caso de ligar e desligar o ar ou a luz, é necessário adicionar "/on" ou "/off" a essa chave, respectivamente, e para a porta serial, "open" ou "close". Neste caso, é utilizado o método PATCH. Especificamente para a luz RGB e o ar condicionado, o método GET é utilizado para obter a cor e a temperatura dos dispositivos mencionados, respectivamente. Para o ar, é necessário adicionar "/temperature" e para a luz, "/color". Se ainda for necessário alterar o valor da temperatura ou mudar a cor, adiciona-se mais um endpoint com um "/", seguido do valor da temperatura (inteiro) ou cor desejada, respectivamente. Novamente, neste caso, é utilizado o método PATCH. Isso resume o formato de todas as requisições possíveis de serem utilizadas.
+
+![Diagrama da aplicação](images/App.png)
 
 ## Class app
 
@@ -132,6 +138,9 @@ Esta função utiliza o método GET para realizar uma requisição, utilizando "
 
 Esta função recebe como parâmetro a requisição fornecida no request. É responsável por manipular as mensagens de sucesso e erro recebidas do broker e exibi-las. Para isso, verifica o código HTTP de status da resposta. Se estiver presente, imprime que a operação foi bem-sucedida e exibe os dados retornados; se houver algum erro nos dados, indica o erro.
 
+![Comunicação do broker com a aplicação](images/Broker-App.png)
+
+
 ## app_machine
 
 Interface responsável por lidar com as entradas do usuário e definir qual rota deve ser enviada na requisição. 
@@ -148,6 +157,7 @@ Esta função é crucial para garantir a robustez da aplicação em cenários ad
 
 O Device_server é responsável por implementar um simulador capaz de assumir o formato de três tipos de dispositivos: Ar condicionado, Luz RGB e Porta automática. Ele também possui uma interface de terminal para interação direta com os dispositivos.
 
+
 ## Classe Device
 
 Esta classe encapsula os atributos essenciais de um dispositivo, incluindo o tipo, ID, host, porta, status e os dados associados. Ela oferece o método `set_initial_params`, que ajusta dinamicamente o status e os dados dependendo do tipo de dispositivo. Além disso, disponibiliza métodos `get` e `set` para acessar e modificar esses parâmetros, seguindo o paradigma da programação orientada a objetos. O principal propósito da classe é a função `initial_send`, que constrói uma string concatenada contendo informações sobre o tipo, ID, host e porta do dispositivo, e a envia via UDP para o broker.
@@ -156,6 +166,9 @@ Esta classe encapsula os atributos essenciais de um dispositivo, incluindo o tip
 
 Esta função é responsável por manipular a solicitação TCP enviada pelo Broker. Recebe como parâmetros o endereço e a conexão. Inicia estabelecendo a conexão e tenta receber uma solicitação de tamanho máximo de 1024 bytes. Se não receber, a função retorna; caso contrário, transforma a mensagem em um vetor usando '/' como separador de rotas e retorna esse vetor.
 
+![Comunicação do broker com o device](images/Broker-Device.png)
+
+
 ## middleware_tcp_udp e access_database
 
 Esta função desempenha um papel crucial na integração entre a recepção de requisições e o envio de respostas. Recebe como entrada os hosts e portas UDP e TCP, além do dispositivo em questão. É projetada para ser executada em uma thread. 
@@ -163,6 +176,9 @@ Esta função desempenha um papel crucial na integração entre a recepção de 
 Inicialmente, tenta criar um socket TCP e associá-lo aos hosts e portas fornecidos, definindo um limite de 5 usuários em espera. Em seguida, entra em um loop infinito para aceitar conexões e usar o retorno dessas conexões como parâmetro para a função responsável pelo tratamento das mensagens TCP recebidas. O resultado dessa função de tratamento é então passado como argumento para a função `access_database`, juntamente com o dispositivo relevante em execução. Esta função verifica o tamanho do vetor de dados retornado e, se não estiver vazio, retorna a informação associada a esse tamanho. Se o dispositivo estiver desligado, retorna essa condição. O retorno da função `access_database` é formatado como mensagem UDP, que será enviada ao broker. Esta mensagem é transformada em uma string antes do envio. Caso a mensagem não esteja vazia, tenta-se criar um socket UDP para enviar a mensagem, fechando o socket logo em seguida. 
 
 Em caso de exceções, como erros ou timeouts, são enviadas mensagens específicas indicando a natureza do problema encontrado durante o processamento da requisição.
+
+![Comunicação do device com o broker](images/Device-Broker.png)
+
 
 ## Interface
 
